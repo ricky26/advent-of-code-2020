@@ -36,15 +36,34 @@ fn main() -> anyhow::Result<()> {
     let mut contents = String::new();
     std::io::stdin().read_to_string(&mut contents)?;
 
-    let max = contents.lines()
+    let seats = contents.lines()
         .map(str::trim)
         .filter(|s| !s.is_empty())
         .map(boarding_pass_to_seat)
-        .fold(Ok::<_, anyhow::Error>(0), |acc, x| {
-            let acc = acc?;
-            let x = x?;
-            Ok(acc.max(x))
-        })?;
+        .collect::<Result<Vec<_>, _>>()?;
+
+    let max = seats.iter().copied()
+        .fold(0, |acc, x| acc.max(x));
+
+    let mut spaces = vec![false; 128 * 8];
+    for seat in seats {
+        spaces[seat as usize] = true;
+    }
+
+    for (idx, space) in spaces.iter().copied().enumerate() {
+        if idx < 8 {
+            continue;
+        }
+
+        let forward_idx = idx - 8;
+        let back_idx = idx + 8;
+        let forward = spaces.get(forward_idx).copied().unwrap_or(false);
+        let back = spaces.get(back_idx).copied().unwrap_or(false);
+
+        if !space && forward && back {
+            println!("empty {}", idx);
+        }
+    }
 
     println!("max {}", max);
     Ok(())
