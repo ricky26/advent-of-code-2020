@@ -24,7 +24,7 @@ fn main() -> anyhow::Result<()> {
                     },
                     Err(e) => {
                         println!(" not validated passport: {}", e);
-                        write!(&mut debug, "-- {}\n{}\n\n", serde_json::to_string(&p)?, e);
+                        write!(&mut debug, "-- {}\n{}\n\n", serde_json::to_string(&p)?, e)?;
                     },
                 }
             },
