@@ -7,10 +7,10 @@ use nom::{
 };
 use super::vm::Instruction;
 use nom::error::{ErrorKind};
-use anyhow::anyhow;
+use anyhow::{anyhow, Error};
 
 #[derive(Debug)]
-pub struct NomError(anyhow::Error);
+pub struct NomError(pub anyhow::Error);
 
 impl std::fmt::Display for NomError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -21,6 +21,12 @@ impl std::fmt::Display for NomError {
 impl From<NomError> for anyhow::Error {
     fn from(e: NomError) -> Self {
         e.0
+    }
+}
+
+impl From<anyhow::Error> for NomError {
+    fn from(e: Error) -> Self {
+        NomError(e)
     }
 }
 
